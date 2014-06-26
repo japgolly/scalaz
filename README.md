@@ -1,3 +1,20 @@
+# Scala JS
+
+This has been compiled for Scala.JS and published to bintray under `japgolly.scalaz`.
+
+project/plugins.sbt
+```
+addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
+```
+
+build.sbt
+```
+resolvers += bintray.Opts.resolver.repo("japgolly", "forks")
+
+libraryDependencies += "japgolly.scalaz" %%% "scalaz-core" % "7.1.0-M7"
+```
+
+
 # Scalaz
 
 Scalaz is a Scala library for functional programming.
