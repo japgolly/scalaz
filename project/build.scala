@@ -45,7 +45,8 @@ object build extends Build {
 
   def scalaCheckVersion = "1.11.3"
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
+                                         scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.4",

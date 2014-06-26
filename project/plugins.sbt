@@ -9,3 +9,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.7.0")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.3.1")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.0")
+
+addSbtPlugin("org.scala-lang.modules.scalajs" % "scalajs-sbt-plugin" % "0.5.0")
+
