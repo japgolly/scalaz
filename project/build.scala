@@ -45,9 +45,15 @@ object build extends Build {
 
   def scalaCheckVersion = "1.11.3"
 
+  import bintray.{Keys => BK}
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
-                                         scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++ Seq[Sett](
-    organization := "org.scalaz",
+                                         scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++
+                                         bintray.Plugin.bintrayPublishSettings ++
+                                         Seq[Sett](
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    organization := "japgolly.scalaz",
+    BK.repository in BK.bintray := "forks",
+    publishMavenStyle := true,
 
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.0"),
@@ -104,8 +110,6 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
 
-    credentialsSetting,
-    publishSetting,
     publishArtifact in Test := false,
 
     // adapted from sbt-release defaults
@@ -299,24 +303,6 @@ object build extends Build {
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
     )
   )
-
-  lazy val publishSetting = publishTo <<= (version).apply{
-    v =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
-
-  lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password") map sys.props.get match {
-      case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
-      case _                           =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
-    }
-  }
 
   lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
 
