@@ -66,7 +66,7 @@ object build extends Build {
     publishMavenStyle := true,
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-RC1"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.1"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
