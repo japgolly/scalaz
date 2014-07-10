@@ -55,15 +55,10 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  import bintray.{Keys => BK}
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
                                          scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++
-                                         bintray.Plugin.bintrayPublishSettings ++
                                          Seq[Sett](
-    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-    organization := "japgolly.scalaz",
-    BK.repository in BK.bintray := "forks",
-    publishMavenStyle := true,
+    organization := "com.github.japgolly.fork.scalaz",
 
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.1"),
@@ -115,6 +110,8 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
 
+    credentialsSetting,
+    publishSetting,
     publishArtifact in Test := false,
 
     // adapted from sbt-release defaults
