@@ -47,8 +47,10 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
-    organization := "org.scalaz",
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
+                                         scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++
+                                         Seq[Sett](
+    organization := "com.github.japgolly.fork.scalaz",
 
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.2"),
