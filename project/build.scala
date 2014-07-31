@@ -61,7 +61,7 @@ object build extends Build {
     organization := "com.github.japgolly.fork.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.1"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.4", "2.11.2"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
