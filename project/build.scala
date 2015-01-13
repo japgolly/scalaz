@@ -58,6 +58,7 @@ object build extends Build {
   }
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
+                                         org.scalajs.sbtplugin.ScalaJSPlugin.projectSettings ++
                                          Seq[Sett](
     organization := "com.github.japgolly.fork.scalaz",
 
