@@ -199,9 +199,11 @@ object ScalazArbitrary {
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
     Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
+  /* japgolly
   import java.util.concurrent.Callable
 
   implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
+  */
 
   import scalaz.concurrent.Promise
 

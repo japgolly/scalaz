@@ -4,6 +4,8 @@ package java
 package util
 package concurrent
 
+/* japgolly
+
 import _root_.java.util.concurrent.Callable
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
@@ -14,3 +16,4 @@ object CallableTest extends SpecLite {
   checkAll("Callable", order.laws[Callable[Int]])
   checkAll("Callable", monad.laws[Callable])
 }
+*/

@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+/* japgolly
 import std.nodeseq._
 import syntax.apply._
 import scalaz.scalacheck.ScalazProperties._
@@ -25,3 +26,4 @@ object NodeSeqTest extends SpecLite {
     checkAll(equal.laws[NodeSeq])
   }
 }
+*/

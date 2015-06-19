@@ -1,5 +1,15 @@
-# Scalaz
+# Scalaz on Scala.JS
 
-[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.1.x)](http://travis-ci.org/scalaz/scalaz)
+This has been compiled for Scala.JS and published to Maven central under `com.github.japgolly.fork.scalaz`.
 
-This is the branch for the 7.1.x release series. For general information see [series/7.2.x](https://github.com/scalaz/scalaz/tree/series/7.2.x) branch or [wiki](https://github.com/scalaz/scalaz/wiki)
+#### Usage
+build.sbt
+```scala
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.3"
+```
+
+### Changes
+* Compiled for Scala.js 0.6.3+
+* Removed support for
+  * `java.util.concurrent.Callable`
+  * `scala.xml.NodeSeq`

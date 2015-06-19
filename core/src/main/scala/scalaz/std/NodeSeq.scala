@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+/* japgolly
 import scala.xml.{ NodeSeq, PrettyPrinter }
 
 trait NodeSeqInstances {
@@ -13,3 +14,4 @@ trait NodeSeqInstances {
 }
 
 object nodeseq extends NodeSeqInstances
+*/

@@ -61,14 +61,26 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
+  def scalajs: Project => Project =
+    _.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin)
+      .settings(scalacOptions += sourceMapOpt)
+
   // no generic signatures for scala 2.10.x and 2.9.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
-    organization := "org.scalaz",
+  val sourceMapOpt = {
+    val a = new java.io.File("").toURI.toString.replaceFirst("/$", "")
+    val g = "https://raw.githubusercontent.com/japgolly/scalaz/v7.1.2-js"
+    s"-P:scalajs:mapSourceURI:$a->$g/"
+  }
 
-    scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
+  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++
+                                         org.scalajs.sbtplugin.ScalaJSPlugin.projectSettings ++
+                                         Seq[Sett](
+    organization := "com.github.japgolly.fork.scalaz",
+
+    scalaVersion := "2.11.6",
+    crossScalaVersions := Seq("2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= {
       val sv = scalaVersion.value
@@ -204,7 +216,7 @@ object build extends Build {
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
-  )
+  ).configure(scalajs)
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, String => String)] (
@@ -242,7 +254,7 @@ object build extends Build {
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
-  )
+  ).configure(scalajs)
 
   lazy val concurrent = Project(
     id = "concurrent",
@@ -254,7 +266,7 @@ object build extends Build {
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
     dependencies = Seq(core, effect)
-  )
+  ).configure(scalajs)
 
   lazy val effect = Project(
     id = "effect",
@@ -265,7 +277,7 @@ object build extends Build {
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
     ),
     dependencies = Seq(core)
-  )
+  ).configure(scalajs)
 
   lazy val iteratee = Project(
     id = "iteratee",
@@ -275,7 +287,7 @@ object build extends Build {
       osgiExport("scalaz.iteratee")
     ),
     dependencies = Seq(effect)
-  )
+  ).configure(scalajs)
 
   lazy val typelevel = Project(
     id = "typelevel",
@@ -285,7 +297,7 @@ object build extends Build {
       osgiExport("scalaz.typelevel", "scalaz.syntax.typelevel")
     ),
     dependencies = Seq(core)
-  )
+  ).configure(scalajs)
 
   lazy val xml = Project(
     id = "xml",
@@ -296,7 +308,7 @@ object build extends Build {
       osgiExport("scalaz.xml")
     ),
     dependencies = Seq(core)
-  )
+  ).configure(scalajs)
 
   lazy val example = Project(
     id = "example",
@@ -307,7 +319,7 @@ object build extends Build {
       previousArtifact := None,
       publishArtifact := false
     )
-  )
+  ).configure(scalajs)
 
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
@@ -318,7 +330,7 @@ object build extends Build {
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value),
       osgiExport("scalaz.scalacheck")
     )
-  )
+  ).configure(scalajs)
 
   lazy val tests = Project(
     id = "tests",
@@ -330,7 +342,7 @@ object build extends Build {
       previousArtifact := None,
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value) % "test"
     )
-  )
+  ).configure(scalajs)
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>

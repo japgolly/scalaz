@@ -1,6 +1,7 @@
 package scalaz
 package std.java.util.concurrent
 
+/* japgolly
 import java.util.concurrent.Callable
 
 
@@ -23,3 +24,4 @@ trait CallableInstances {
 }
 
 object callable extends CallableInstances
+*/
