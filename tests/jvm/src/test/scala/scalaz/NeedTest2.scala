@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object NeedTest extends SpecLite {
+object NeedTest2 extends SpecLite {
 
   "Need" should {
     "clear the Function0 reference" in {
