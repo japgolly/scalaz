@@ -6,12 +6,6 @@ import org.scalacheck._
 import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
 
-// Necessary because scalacheck.Prop is marked with @JSExport :(
-final class ConvProp[A](a: => A)(implicit ev: (A) => Prop) extends Prop {
-  override def apply(prms: Parameters): Result =
-    ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
-}
-
 abstract class SpecLite extends Properties("") {
   def updateName: Unit = {
     val f = classOf[Properties].getDeclaredField("name")
@@ -52,7 +46,7 @@ abstract class SpecLite extends Properties("") {
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 
     def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
-      property(context + ":" + s) = new ConvProp(a)
+      property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
   }
 
   implicit def enrichString(s: String) = new StringOps(s)
