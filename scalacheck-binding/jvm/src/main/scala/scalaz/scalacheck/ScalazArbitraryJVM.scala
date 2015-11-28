@@ -1,23 +1,19 @@
 package scalaz
 package scalacheck
 
-import java.math.BigInteger
-import org.scalacheck.{Gen, Arbitrary}
-import collection.mutable.ArraySeq
-import reflect.ClassTag
+import org.scalacheck.Arbitrary
+import Scalaz._
+import Arbitrary._
+import ScalaCheckBinding._
 
 /**
  * Instances of {@link scalacheck.Arbitrary} for JVM-only parts of Scalaz.
  */
 abstract class ScalazArbitraryPlatform {
-  import Scalaz._
-  import Tags._
-  import Arbitrary._
-  import Gen._
-  import ScalaCheckBinding._
 
   import java.util.concurrent.Callable
-  implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
+  implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] =
+    Functor[Arbitrary].map(implicitly[Arbitrary[A]])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Future
   implicit def FutureArbitrary[A: Arbitrary]: Arbitrary[Future[A]] =
