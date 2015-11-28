@@ -6,8 +6,6 @@ import GenTypeClass._
 
 import java.awt.Desktop
 
-import scala.collection.immutable.IndexedSeq
-
 import sbtrelease._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
@@ -22,6 +20,9 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
+
+import org.scalajs.sbtplugin.ScalaJSPlugin
+import ScalaJSPlugin.autoImport._
 
 object build extends Build {
   type Sett = Def.Setting[_]
@@ -174,6 +175,17 @@ object build extends Build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
+
+  def scalajsSettings: Project => Project =
+    _.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin)
+      .settings(scalacOptions += sourceMapOpt)
+
+  val sourceMapOpt = {
+    val a = new java.io.File("").toURI.toString.replaceFirst("/$", "")
+    val g = "https://raw.githubusercontent.com/scalaz/scalaz/v7.2.0" // TODO <----------------------------------------
+    s"-P:scalajs:mapSourceURI:$a->$g/"
+  }
+
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
@@ -181,13 +193,15 @@ object build extends Build {
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+    aggregate = Seq(
+      coreJVM, concurrentJVM, effectJVM, iterateeJVM,
+      coreJS, concurrentJS, effectJS, iterateeJS,
+      example, scalacheckBinding, tests)
   )
 
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val core = crossProject
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -196,57 +210,56 @@ object build extends Build {
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    )
-  ).enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
 
-  lazy val concurrent = Project(
-    id = "concurrent",
-    base = file("concurrent"),
-    settings = standardSettings ++ Seq[Sett](
+	lazy val coreJVM = core.jvm
+	lazy val coreJS  = core.js
+
+  lazy val effect = crossProject
+    .settings(standardSettings: _*)
+    .settings(
+      name := "scalaz-effect",
+      typeClasses := TypeClass.effect,
+      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+    .dependsOn(core)
+
+	lazy val effectJVM = effect.jvm
+	lazy val effectJS  = effect.js
+
+  lazy val concurrent = crossProject
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-concurrent",
       typeClasses := TypeClass.concurrent,
       osgiExport("scalaz.concurrent"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    ),
-    dependencies = Seq(core, effect)
-  )
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    .dependsOn(core, effect)
 
-  lazy val effect = Project(
-    id = "effect",
-    base = file("effect"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-effect",
-      typeClasses := TypeClass.effect,
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
-    ),
-    dependencies = Seq(core)
-  )
+	lazy val concurrentJVM = concurrent.jvm
+	lazy val concurrentJS  = concurrent.js
 
-  lazy val iteratee = Project(
-    id = "iteratee",
-    base = file("iteratee"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val iteratee = crossProject
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee")
-    ),
-    dependencies = Seq(effect)
-  )
+      osgiExport("scalaz.iteratee"))
+		.dependsOn(core, effect)
 
-  lazy val example = Project(
-    id = "example",
-    base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent),
-    settings = standardSettings ++ Seq[Sett](
+	lazy val iterateeJVM = iteratee.jvm
+	lazy val iterateeJS  = iteratee.js
+
+  lazy val example = project
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-example",
-      publishArtifact := false
-    )
-  )
+      publishArtifact := false)
+    .dependsOn(coreJVM, iterateeJVM, concurrentJVM)
 
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, iteratee),
+    dependencies = Seq(coreJVM, concurrentJVM, iterateeJVM),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
@@ -257,7 +270,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
+    dependencies = Seq(coreJVM, iterateeJVM, concurrentJVM, effectJVM, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
