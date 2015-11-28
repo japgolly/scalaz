@@ -1,17 +1,11 @@
 package scalaz
 
-import reflect.ClassTag
-
+import scala.reflect.ClassTag
 import org.scalacheck._
 import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
 
-abstract class SpecLite extends Properties("") {
-  def updateName: Unit = {
-    val f = classOf[Properties].getDeclaredField("name")
-    f.setAccessible(true)
-    f.set(this, getClass.getName.stripSuffix("$"))
-  }
+abstract class SpecLite extends Properties("") with SpecLitePlatform {
   updateName
 
   def checkAll(name: String, props: Properties) {
