@@ -5,12 +5,6 @@ import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Prop.forAll
 import Scalaz._
 
-// Necessary because scalacheck.Prop is marked with @JSExport :(
-final class ResizeProp(p: Prop, max: Int) extends Prop {
-  override def apply(params: Gen.Parameters) =
-    p(params.withSize(params.size % (max + 1)))
-}
-
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
@@ -272,7 +266,7 @@ object ScalazProperties {
   }
 
   private def resizeProp(p: Prop, max: Int): Prop =
-    new ResizeProp(p, max)
+    Prop(params => p(params.withSize(params.size % (max + 1))))
 
   object traverse {
     def identityTraverse[F[_], X, Y](implicit f: Traverse[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
