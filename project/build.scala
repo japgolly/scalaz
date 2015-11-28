@@ -23,6 +23,7 @@ import sbtunidoc.Plugin.UnidocKeys._
 
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import ScalaJSPlugin.autoImport._
+import org.scalajs.sbtplugin.cross.CrossProject
 
 object build extends Build {
   type Sett = Def.Setting[_]
@@ -194,9 +195,9 @@ object build extends Build {
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(
-      coreJVM, concurrentJVM, effectJVM, iterateeJVM,
-      coreJS, concurrentJS, effectJS, iterateeJS,
-      example, scalacheckBinding, tests)
+      coreJVM, concurrentJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM,
+      coreJS , concurrentJS , effectJS , iterateeJS , scalacheckBindingJS , testsJS ,
+      example)
   )
 
   lazy val core = crossProject
@@ -213,8 +214,8 @@ object build extends Build {
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
 
-	lazy val coreJVM = core.jvm
-	lazy val coreJS  = core.js
+  lazy val coreJVM = core.jvm
+  lazy val coreJS  = core.js
 
   lazy val effect = crossProject
     .settings(standardSettings: _*)
@@ -224,8 +225,8 @@ object build extends Build {
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
 
-	lazy val effectJVM = effect.jvm
-	lazy val effectJS  = effect.js
+  lazy val effectJVM = effect.jvm
+  lazy val effectJS  = effect.js
 
   lazy val concurrent = crossProject
     .settings(standardSettings: _*)
@@ -236,18 +237,18 @@ object build extends Build {
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .dependsOn(core, effect)
 
-	lazy val concurrentJVM = concurrent.jvm
-	lazy val concurrentJS  = concurrent.js
+  lazy val concurrentJVM = concurrent.jvm
+  lazy val concurrentJS  = concurrent.js
 
   lazy val iteratee = crossProject
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
-		.dependsOn(core, effect)
+    .dependsOn(core, effect)
 
-	lazy val iterateeJVM = iteratee.jvm
-	lazy val iterateeJS  = iteratee.js
+  lazy val iterateeJVM = iteratee.jvm
+  lazy val iterateeJS  = iteratee.js
 
   lazy val example = project
     .settings(standardSettings: _*)
@@ -256,27 +257,28 @@ object build extends Build {
       publishArtifact := false)
     .dependsOn(coreJVM, iterateeJVM, concurrentJVM)
 
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
-    dependencies = Seq(coreJVM, concurrentJVM, iterateeJVM),
-    settings     = standardSettings ++ Seq[Sett](
-      name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
-      osgiExport("scalaz.scalacheck")
-    )
-  )
+  lazy val scalacheckBinding =
+    CrossProject("scalacheck-binding", file("scalacheck-binding"), CrossType.Full)
+      .settings(standardSettings: _*)
+      .settings(
+        name := "scalaz-scalacheck-binding",
+        libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
+        osgiExport("scalaz.scalacheck"))
+      .dependsOn(core, concurrent, iteratee)
 
-  lazy val tests = Project(
-    id = "tests",
-    base = file("tests"),
-    dependencies = Seq(coreJVM, iterateeJVM, concurrentJVM, effectJVM, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
+  lazy val scalacheckBindingJVM = scalacheckBinding.jvm
+  lazy val scalacheckBindingJS  = scalacheckBinding.js
+
+  lazy val tests = crossProject
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-tests",
       publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
-    )
-  )
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
+    .dependsOn(core, effect, concurrent, iteratee, scalacheckBinding)
+
+  lazy val testsJVM = tests.jvm
+  lazy val testsJS  = tests.js
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>
