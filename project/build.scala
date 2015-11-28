@@ -262,7 +262,7 @@ object build extends Build {
         libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
         osgiExport("scalaz.scalacheck"))
       .dependsOn(core, iteratee)
-      .jsConfigure(_ dependsOn concurrent)
+      .jvmConfigure(_ dependsOn concurrent)
 
   lazy val scalacheckBindingJVM = scalacheckBinding.jvm
   lazy val scalacheckBindingJS  = scalacheckBinding.js
@@ -274,7 +274,7 @@ object build extends Build {
       publishArtifact := false,
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
-    .jsConfigure(_ dependsOn concurrent)
+    .jvmConfigure(_ dependsOn concurrent)
 
   lazy val testsJVM = tests.jvm
   lazy val testsJS  = tests.js

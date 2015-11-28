@@ -9,7 +9,7 @@ import reflect.ClassTag
 /**
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
  */
-object ScalazArbitrary {
+object ScalazArbitrary extends ScalazArbitraryPlatform {
   import Scalaz._
   import Tags._
   import Arbitrary._
@@ -252,18 +252,6 @@ object ScalazArbitrary {
   }
 
   implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
-
-  import java.util.concurrent.Callable
-
-  implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
-
-  import scalaz.concurrent.Future
-  implicit def FutureArbitrary[A: Arbitrary]: Arbitrary[Future[A]] =
-    Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
-
-  import scalaz.concurrent.Task
-  implicit def TaskArbitrary[A: Arbitrary]: Arbitrary[Task[A]] =
-    Arbitrary(arbitrary[A] map ((x: A) => Task.now(x)))
 
   import Zipper._
   implicit def ZipperArbitrary[A: Arbitrary]: Arbitrary[Zipper[A]] =
