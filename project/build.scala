@@ -275,6 +275,7 @@ object build extends Build {
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
     .jvmConfigure(_ dependsOn concurrent)
+    .jsSettings(scalaJSStage in Test := FastOptStage)
 
   lazy val testsJVM = tests.jvm
   lazy val testsJS  = tests.js
