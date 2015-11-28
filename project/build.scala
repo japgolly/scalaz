@@ -195,9 +195,9 @@ object build extends Build {
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(
-      coreJVM, concurrentJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM,
-      coreJS , concurrentJS , effectJS , iterateeJS , scalacheckBindingJS , testsJS ,
-      example)
+      coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM,
+      coreJS , effectJS , iterateeJS , scalacheckBindingJS , testsJS ,
+      concurrent, example)
   )
 
   lazy val core = crossProject
@@ -228,17 +228,14 @@ object build extends Build {
   lazy val effectJVM = effect.jvm
   lazy val effectJS  = effect.js
 
-  lazy val concurrent = crossProject
+  lazy val concurrent = project
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-concurrent",
       typeClasses := TypeClass.concurrent,
       osgiExport("scalaz.concurrent"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
-    .dependsOn(core, effect)
-
-  lazy val concurrentJVM = concurrent.jvm
-  lazy val concurrentJS  = concurrent.js
+    .dependsOn(coreJVM, effectJVM)
 
   lazy val iteratee = crossProject
     .settings(standardSettings: _*)
@@ -255,7 +252,7 @@ object build extends Build {
     .settings(
       name := "scalaz-example",
       publishArtifact := false)
-    .dependsOn(coreJVM, iterateeJVM, concurrentJVM)
+    .dependsOn(coreJVM, iterateeJVM, concurrent)
 
   lazy val scalacheckBinding =
     CrossProject("scalacheck-binding", file("scalacheck-binding"), CrossType.Full)
@@ -264,7 +261,8 @@ object build extends Build {
         name := "scalaz-scalacheck-binding",
         libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
         osgiExport("scalaz.scalacheck"))
-      .dependsOn(core, concurrent, iteratee)
+      .dependsOn(core, iteratee)
+      .jsConfigure(_ dependsOn concurrent)
 
   lazy val scalacheckBindingJVM = scalacheckBinding.jvm
   lazy val scalacheckBindingJS  = scalacheckBinding.js
@@ -275,7 +273,8 @@ object build extends Build {
       name := "scalaz-tests",
       publishArtifact := false,
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
-    .dependsOn(core, effect, concurrent, iteratee, scalacheckBinding)
+    .dependsOn(core, effect, iteratee, scalacheckBinding)
+    .jsConfigure(_ dependsOn concurrent)
 
   lazy val testsJVM = tests.jvm
   lazy val testsJS  = tests.js
