@@ -9,7 +9,6 @@ trait AllInstances
   with scalaz.std.math.OrderingInstances
   with scalaz.std.java.util.MapInstances
   with scalaz.std.java.math.BigIntegerInstances
-  with scalaz.std.java.EnumInstances
   with PlatformInstances
 
 object AllInstances extends AllInstances

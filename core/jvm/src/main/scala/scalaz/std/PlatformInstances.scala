@@ -6,6 +6,7 @@ package std
  */
 trait PlatformInstances
   extends scalaz.std.java.util.concurrent.CallableInstances
+     with scalaz.std.java.EnumInstances
 
 trait FutureInstancesP extends FutureInstances1 {
   import scala.concurrent.{Await, ExecutionContext, Future}
