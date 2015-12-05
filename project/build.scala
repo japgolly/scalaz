@@ -52,7 +52,7 @@ object build extends Build {
   def scalac210Options = Seq("-Yno-generic-signatures")
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
-    organization := "org.scalaz",
+    organization := "com.github.japgolly.fork.scalaz",
 
     scalaVersion := "2.10.6",
     crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
@@ -183,7 +183,7 @@ object build extends Build {
 
   val sourceMapOpt = {
     val a = new java.io.File("").toURI.toString.replaceFirst("/$", "")
-    val g = "https://raw.githubusercontent.com/scalaz/scalaz/v7.2.0" // TODO <----------------------------------------
+    val g = "https://raw.githubusercontent.com/japgolly/scalaz/v7.2.0-JS" // TODO <----------------------------------------
     s"-P:scalajs:mapSourceURI:$a->$g/"
   }
 

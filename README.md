@@ -1,5 +1,13 @@
-# Scalaz
+# Scalaz on Scala.JS
 
-[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.2.x)](http://travis-ci.org/scalaz/scalaz)
+This has been compiled for Scala.JS and published to Maven central under `com.github.japgolly.fork.scalaz`.
 
-This is the branch for the 7.2.x release series. For general information see [default development branch](https://github.com/scalaz/scalaz) or [wiki](https://github.com/scalaz/scalaz/wiki)
+#### Usage
+build.sbt
+```scala
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.2.0"
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-effect" % "7.2.0"
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-iteratee" % "7.2.0"
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-scalacheck-binding" % "7.2.0"
+```
+
