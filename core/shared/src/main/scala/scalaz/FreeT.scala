@@ -44,6 +44,22 @@ object FreeT extends FreeTInstances {
 
   def roll[S[_], M[_], A](value: S[FreeT[S, M, A]])(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, A] =
     liftF[S, M, FreeT[S, M, A]](value).flatMap(identity)
+
+  import Isomorphism._
+
+  def isoFree[S[_]](implicit S: Functor[S]): FreeT[S, Id.Id, ?] <~> Free[S, ?] =
+    new IsoFunctorTemplate[FreeT[S, Id.Id, ?], Free[S, ?]] {
+      override def to[A](fa: FreeT[S, Id.Id, A]) = fa match {
+        case Suspend(\/-(a)) =>
+          Free.roll(S.map(a)(to(_)))
+        case Suspend(-\/(a)) =>
+          Free.point(a)
+        case a @ Gosub() =>
+          to(a.a).flatMap(a.f.andThen(to(_)))
+      }
+      override def from[A](ga: Free[S, A]) =
+        ga.toFreeT
+    }
 }
 
 sealed abstract class FreeT[S[_], M[_], A] {
@@ -131,7 +147,31 @@ sealed abstract class FreeT[S[_], M[_], A] {
   }
 }
 
-sealed abstract class FreeTInstances4 {
+sealed abstract class FreeTInstances6 {
+  implicit def freeTMonadTell[S[_]: Functor, M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] =
+    new MonadTell[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def writer[A](w: E, v: A) =
+        FreeT.liftM(M1.writer(w, v))
+    }
+}
+
+sealed abstract class FreeTInstances5 extends FreeTInstances6 {
+  implicit def freeTMonadReader[S[_]: Functor, M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
+    new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def ask =
+        FreeT.liftM(M1.ask)
+      override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
+        fa.hoistM(new (M ~> M){
+          def apply[A](a: M[A]) = M1.local(f)(a)
+        })
+    }
+}
+
+sealed abstract class FreeTInstances4 extends FreeTInstances5 {
   implicit def freeTMonadState[S[_]: Functor, M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
     new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
       override def S = implicitly
