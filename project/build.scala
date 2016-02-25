@@ -206,8 +206,7 @@ object build extends Build {
       coreJS , effectJS , iterateeJS , scalacheckBindingJS , testsJS ,
       concurrent, example)
   )
-    .settings(
-      scalaJSUseRhino in Global := true)
+  //  .settings( scalaJSUseRhino in Global := true)
 
   lazy val core = crossProject
     .settings(standardSettings: _*)
@@ -284,7 +283,7 @@ object build extends Build {
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
     .jvmConfigure(_ dependsOn concurrent)
-    //.jsSettings(jsEnv := PhantomJSEnv().value) // Faster
+    //.jsSettings(jsEnv := PhantomJSEnv().value)
 
   lazy val testsJVM = tests.jvm
   lazy val testsJS  = tests.js
