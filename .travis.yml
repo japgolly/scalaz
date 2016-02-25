@@ -23,8 +23,6 @@ scala:
   - 2.10.6
 jdk:
   - openjdk7
-node_js:
-  - "iojs"
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION testsJS/test
@@ -47,3 +45,10 @@ addons:
     packages:
       - oracle-java8-installer
 
+# Use PhantomJS 2
+# https://mediocre.com/forum/topics/phantomjs-2-and-travis-ci-we-beat-our-heads-against-a-wall-so-you-dont-have-to
+install:
+  - mkdir travis-phantomjs
+  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O "$PWD"/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - tar -xvf "$PWD"/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C "$PWD"/travis-phantomjs
+  - export PATH="$PWD/travis-phantomjs:$PATH"
