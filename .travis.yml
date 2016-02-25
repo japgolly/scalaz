@@ -24,9 +24,16 @@ scala:
 jdk:
   - openjdk7
 
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install node
+  - nvm use node
+  - npm install
+
+
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m -XX:ReservedCodeCacheSize=256M check-gen-type-classes test:compile testsJS/test:fastOptJS
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m testsJVM/test
+  #- sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m -XX:ReservedCodeCacheSize=256M check-gen-type-classes test:compile testsJS/test:fastOptJS
+  #- sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m testsJVM/test
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m testsJS/test
     #- travis_wait 30 sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m testsJS/test:fullOptJS
     #- sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m 'set scalaJSStage in Global := FullOptStage' testsJS/test

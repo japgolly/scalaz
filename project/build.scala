@@ -206,7 +206,7 @@ object build extends Build {
       coreJS , effectJS , iterateeJS , scalacheckBindingJS , testsJS ,
       concurrent, example)
   )
-  //  .settings( scalaJSUseRhino in Global := true)
+  .settings( scalaJSUseRhino in Global := false)
 
   lazy val core = crossProject
     .settings(standardSettings: _*)
