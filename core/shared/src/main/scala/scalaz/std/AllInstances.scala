@@ -12,6 +12,5 @@ trait AllInstances
   with scalaz.std.java.EnumInstances
   with scalaz.std.java.util.concurrent.CallableInstances
   with PlatformInstances
-  with scalaz.std.java.TimeInstances
 
 object AllInstances extends AllInstances

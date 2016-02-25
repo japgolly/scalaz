@@ -5,6 +5,7 @@ package std
  * Instances available on the JVM only.
  */
 trait PlatformInstances
+  extends scalaz.std.java.TimeInstances
 
 trait FutureInstancesP extends FutureInstances1 {
   import scala.concurrent.{Await, ExecutionContext, Future}
