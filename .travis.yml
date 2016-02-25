@@ -25,6 +25,7 @@ jdk:
   - openjdk7
 
 script:
+  - sbt ++$TRAVIS_SCALA_VERSION testsJS/test:fastOptJS
   - sbt ++$TRAVIS_SCALA_VERSION testsJS/test
   - sbt ++$TRAVIS_SCALA_VERSION -XX:ReservedCodeCacheSize=256M -J-Xmx3784m check-gen-type-classes test:compile testsJS/test:fastOptJS
   - sbt ++$TRAVIS_SCALA_VERSION testsJVM/test
