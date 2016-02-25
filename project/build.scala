@@ -284,6 +284,7 @@ object build extends Build {
     .dependsOn(core, effect, iteratee, scalacheckBinding)
     .jvmConfigure(_ dependsOn concurrent)
     .jvmSettings(parallelExecution in Test := false) // scalaz.concurrent tests failing on Travis
+    .jsSettings(jsEnv := NodeJSEnv().value)
     //.jsSettings(jsEnv := PhantomJSEnv().value)
 
   lazy val testsJVM = tests.jvm
