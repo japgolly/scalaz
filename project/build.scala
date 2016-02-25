@@ -85,10 +85,16 @@ object build extends Build {
 
     genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
       (scalaSource, streams, typeClasses) =>
-        typeClasses.flatMap {
-          tc =>
-            val typeClassSource0 = typeclassSource(tc)
-            typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
+        // Sources are shared between JS and JVM project and so typeclasses need only be generated once
+        if (scalaSource.toString.contains("/js/"))
+          Nil
+        else {
+          val sharedSource = file(scalaSource.absolutePath.replace("/jvm/", "/shared/"))
+          typeClasses.flatMap {
+            tc =>
+              val typeClassSource0 = typeclassSource(tc)
+              typeClassSource0.sources.map(_.createOrUpdate(sharedSource, streams.log))
+          }
         }
     },
     checkGenTypeClasses <<= genTypeClasses.map{ classes =>
