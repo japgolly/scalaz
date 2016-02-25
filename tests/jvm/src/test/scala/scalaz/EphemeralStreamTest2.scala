@@ -1,5 +1,7 @@
 package scalaz
 
+import std.AllInstances._
+
 object EphemeralStreamTest2 extends SpecLite {
   "foldLeft large stream" in {
     val list = List.fill(10000000)(1)
