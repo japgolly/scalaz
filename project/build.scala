@@ -77,7 +77,8 @@ object build extends Build {
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
-    parallelExecution in Test := false,
+    // parallelExecution in Test := false,
+
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1"),
 
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
